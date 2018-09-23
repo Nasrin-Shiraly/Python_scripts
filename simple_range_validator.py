@@ -53,15 +53,42 @@ def argument_range_validator(_func=None, **deco_kwargs):
                 """
                 for (argument, (condition_one, condition_two)) in deco_kwargs.items():
 
+                    iterable_object_flag = False
+
                     if argument in positional_args:
-                        if positional_args_dictionary[argument] not in range(condition_one, condition_two):
-                            """throw some exception, passing and just printing below for the sake of execution now"""
-                            print(f"{positional_args_dictionary[argument]} was not in the acceptable range for {argument}!")
+
+                        try:
+                            _ = (e for e in positional_args_dictionary[argument])
+                            iterable_object_flag = True
+                        except TypeError:
+                            pass
+
+                        if iterable_object_flag:
+                            for each in positional_args_dictionary[argument]:
+                                if each not in range(condition_one, condition_two):
+                                    """throw some exception, passing and just printing below for the sake of execution now"""
+                                    print(f"{positional_args_dictionary[argument]} was not in the acceptable range for {argument}!")
+                        else:
+                            if positional_args_dictionary[argument] not in range(condition_one, condition_two):
+                                """throw some exception, passing and just printing below for the sake of execution now"""
+                                print(f"{positional_args_dictionary[argument]} was not in the acceptable range for {argument}!")
 
                     elif argument in local_variable['kwargs'].keys():
-                        if value_dictionary[argument] not in range(condition_one, condition_two):
-                            """throw some exception, passing and just printing below for the sake of execution now"""
-                            print(f"{value_dictionary[argument]} was not in the acceptable range for {argument}!")
+                        try:
+                            _ = (e for e in value_dictionary[argument])
+                            iterable_object_flag = True
+                        except TypeError:
+                            pass
+
+                        if iterable_object_flag:
+                            for each in value_dictionary[argument]:
+                                if each not in range(condition_one, condition_two):
+                                    """throw some exception, passing and just printing below for the sake of execution now"""
+                                    print(f"{value_dictionary[argument]} was not in the acceptable range for {argument}!")
+                        else:
+                            if value_dictionary[argument] not in range(condition_one, condition_two):
+                                    """throw some exception, passing and just printing below for the sake of execution now"""
+                                    print(f"{value_dictionary[argument]} was not in the acceptable range for {argument}!")
 
                 return func(**value_dictionary_args)
             return argument_range_validator_wrapper
@@ -114,6 +141,13 @@ Neither the function nor the decorator will have any arguments for this test
 def test_func_4():
     print(f"{test_func_4.__name__} says Hi!")
 
+"""
+This tests if we can also catch iterable items such as lists and tuples
+"""
+@argument_range_validator(b=(1,6), c=(3,10))
+def test_func_5(a:str,b:list,c:tuple):
+    pass
+
 
 """
 Both the function and the decorator have arguments for this test
@@ -130,3 +164,6 @@ if __name__ == '__main__':
     test_func_3(2, c=3)
     test_func_4()
     test_func_for_personnel('Nasrin', 31, department=39, last_name='Shirali')
+    test_func_5('Nasrin',(17,4),b=[1,2,3])
+
+
